@@ -1,6 +1,6 @@
 # 4.Execution_of_NetworkCommands
 ## AIM :Use of Network commands in Real Time environment
-## Software : Command Prompt And Network Protocol Analyzer
+## Software :Command Prompt And Network Protocol Analyzer
 ## Procedure: To do this EXPERIMENT- follows these steps:
 <BR>
 In this EXPERIMENT- students have to understand basic networking commands e.g cpdump, netstat, ifconfig, nslookup ,traceroute and also Capture ping and traceroute PDUs using a network protocol analyzer 
@@ -26,7 +26,64 @@ This commands includes
 • Other IP Commands e.g. show ip route etc.
 <BR>
 
+## Program
+
+# client.py
+```
+import socket
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+host = "127.0.0.1"
+port = 6000
+client.connect((host, port))
+print("Connected to Server")
+print("You can use commands like: ping google.com, ipconfig, netstat, nslookup google.com")
+print("Type 'exit' to quit")
+while True:
+    command = input("\nEnter Network Command: ")
+    client.send(command.encode())
+    if command.lower() == "exit":
+        break
+    output = client.recv(4096).decode()
+    print("\n--- Command Output ---")
+    print(output)
+client.close()
+```
+# server.py
+
+```
+import socket
+import subprocess
+import platform
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+host = "127.0.0.1"
+port = 6000
+server.bind((host, port))
+server.listen(1)
+print("Server started... Waiting for connection...")
+conn, addr = server.accept()
+print("Connected to:", addr)
+while True:
+    command = conn.recv(1024).decode()
+    if command.lower() == "exit":
+        print("Client disconnected.")
+        break
+    print("Command received:", command)
+    try:
+        output = subprocess.check_output(command, shell=True)
+        conn.send(output)
+    except Exception as e:
+        conn.send(str(e).encode())
+conn.close()
+server.close()
+```
+
 ## Output
+
+# Client
+![alt text](<Screenshot 2026-02-21 133733.png>)
+
+# Server
+![alt text](<Screenshot 2026-02-21 133713.png>)
 
 ## Result
 Thus Execution of Network commands Performed 
